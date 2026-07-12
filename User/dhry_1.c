@@ -53,7 +53,7 @@ float           Microseconds,
 /* end of variables for time measurement */
 
 //#pragma clang section text="RAM_CODE"
-void Proc_1 (Rec_Pointer Ptr_Val_Par)
+RAM_FUNC void Proc_1 (Rec_Pointer Ptr_Val_Par)
 /******************/
     /* executed once */
 {
@@ -82,7 +82,7 @@ void Proc_1 (Rec_Pointer Ptr_Val_Par)
     structassign (*Ptr_Val_Par, *Ptr_Val_Par->Ptr_Comp);
 } /* Proc_1 */
 
-void Proc_2 (One_Fifty *Int_Par_Ref)
+RAM_FUNC void Proc_2 (One_Fifty *Int_Par_Ref)
 /******************/
     /* executed once */
     /* *Int_Par_Ref == 1, becomes 4 */
@@ -102,7 +102,7 @@ void Proc_2 (One_Fifty *Int_Par_Ref)
     while (Enum_Loc != Ident_1); /* true */
 } /* Proc_2 */
 
-void Proc_3 (Rec_Pointer *Ptr_Ref_Par)
+RAM_FUNC void Proc_3 (Rec_Pointer *Ptr_Ref_Par)
 /******************/
     /* executed once */
     /* Ptr_Ref_Par becomes Ptr_Glob */
@@ -113,7 +113,7 @@ void Proc_3 (Rec_Pointer *Ptr_Ref_Par)
   Proc_7 (10, Int_Glob, &Ptr_Glob->variant.var_1.Int_Comp);
 } /* Proc_3 */
 
-void Proc_4 (void) /* without parameters */
+RAM_FUNC void Proc_4 (void) /* without parameters */
 /*******/
     /* executed once */
 {
@@ -124,7 +124,7 @@ void Proc_4 (void) /* without parameters */
   Ch_2_Glob = 'B';
 } /* Proc_4 */
 
-void Proc_5 (void) /* without parameters */
+RAM_FUNC void Proc_5 (void) /* without parameters */
 /*******/
     /* executed once */
 {
@@ -132,7 +132,7 @@ void Proc_5 (void) /* without parameters */
   Bool_Glob = false;
 } /* Proc_5 */
 
-void dhry_main(uint32_t freq) {
+RAM_FUNC void dhry_main(uint32_t freq) {
 	One_Fifty       Int_1_Loc;
   REG One_Fifty   Int_2_Loc;
   One_Fifty       Int_3_Loc;
@@ -333,4 +333,4 @@ void dhry_main(uint32_t freq) {
 		printf("DMIPS/MHz:\t%4.3f\n", Dhrystones_Per_Second /(1757 * (freq/1000000)));
   }
 }
-//#pragma clang section text="" // Reset back to default flash execution
+#pragma clang section text="" // Reset back to default flash execution

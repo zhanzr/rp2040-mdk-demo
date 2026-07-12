@@ -28,7 +28,7 @@ extern  int     Int_Glob;
 extern  char    Ch_1_Glob;
 
 //#pragma clang section text="RAM_CODE"
-void Proc_6 (Enumeration Enum_Val_Par, Enumeration *Enum_Ref_Par)
+RAM_FUNC void Proc_6 (Enumeration Enum_Val_Par, Enumeration *Enum_Ref_Par)
 /*********************************/
     /* executed once */
     /* Enum_Val_Par == Ident_3, Enum_Ref_Par becomes Ident_2 */
@@ -60,7 +60,7 @@ void Proc_6 (Enumeration Enum_Val_Par, Enumeration *Enum_Ref_Par)
 } /* Proc_6 */
 
 
-void Proc_7 (One_Fifty Int_1_Par_Val,
+RAM_FUNC void Proc_7 (One_Fifty Int_1_Par_Val,
              One_Fifty Int_2_Par_Val,
              One_Fifty *Int_Par_Ref )
 /**********************************************/
@@ -79,7 +79,7 @@ void Proc_7 (One_Fifty Int_1_Par_Val,
 } /* Proc_7 */
 
 
-void Proc_8 (Arr_1_Dim Arr_1_Par_Ref,
+RAM_FUNC void Proc_8 (Arr_1_Dim Arr_1_Par_Ref,
              Arr_2_Dim Arr_2_Par_Ref,
              int Int_1_Par_Val,
              int Int_2_Par_Val)
@@ -103,7 +103,7 @@ void Proc_8 (Arr_1_Dim Arr_1_Par_Ref,
 } /* Proc_8 */
 
 
-Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val)
+RAM_FUNC Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val)
 /*************************************************/
     /* executed three times                                         */
     /* first call:      Ch_1_Par_Val == 'H', Ch_2_Par_Val == 'R'    */
@@ -126,7 +126,7 @@ Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val)
 } /* Func_1 */
 
 
-Boolean Func_2 (Str_30  Str_1_Par_Ref, Str_30  Str_2_Par_Ref)
+RAM_FUNC Boolean Func_2 (Str_30  Str_1_Par_Ref, Str_30  Str_2_Par_Ref)
 /*************************************************/
     /* executed once */
     /* Str_1_Par_Ref == "DHRYSTONE PROGRAM, 1'ST STRING" */
@@ -166,7 +166,7 @@ Boolean Func_2 (Str_30  Str_1_Par_Ref, Str_30  Str_2_Par_Ref)
 } /* Func_2 */
 
 
-Boolean Func_3 (Enumeration Enum_Par_Val)
+RAM_FUNC Boolean Func_3 (Enumeration Enum_Par_Val)
 /***************************/
     /* executed once        */
     /* Enum_Par_Val == Ident_3 */

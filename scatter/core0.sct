@@ -103,11 +103,31 @@ LR_ROM +0 __RO_SIZE - 0x100  {                      ; load region size_region
         * (.mutex_array)
     }
 
+	/* 
+     * NEW: Dedicated SRAM Execution Region for Code.
+     * Consolidates your custom .ram_code section along with the Pico SDK's 
+     * time-critical and sync functions so they can run safely when XIP is disabled.
+     */
+    ER_IRAM_CODE +0 {
+        * (.ram_code)
+        * (.ram_code.*)
+        * (.time_critical.*)
+        * (.pico_time.*)
+        * (hardware_sync.*)
+        
+        ; Explicit .o lines removed. The C attribute handles mapping seamlessly!
+    }
+	
+    /*
+     * Standard Read/Write and Zero-Initialized Variables Data 
+     */
     RW_RAM +0  {                                    ; RW data
-        .ANY (.time_critical.*)
         .ANY (+RW +ZI)
     }
-
+	
+    /*
+     * Uninitialized Data Region
+     */
     RW_IRAM_NOINIT +0 UNINIT {  ; RW data
         .ANY (.after_data.*)
         .ANY (.bss.noinit)
@@ -119,16 +139,14 @@ LR_ROM +0 __RO_SIZE - 0x100  {                      ; load region size_region
     }
     #endif
 
-
-
     /* This empty, zero long execution region is here to mark the limit address
      * of the last execution region that is allocated in SRAM.
      */
     SRAM_WATERMARK +0 EMPTY 0x0 {
     }
+    
     /* Make sure that the sections allocated in the SRAM does not exceed the
      * size of the SRAM available.
      */
     ScatterAssert(ImageLimit(SRAM_WATERMARK) <= __RAM_BASE + __RAM_SIZE)
-
 }

@@ -5,9 +5,13 @@
 extern "C" {
 #endif
 	
+#define RAM_FUNC
+//#define RAM_FUNC __attribute__((section(".ram_code")))
+
 uint32_t HAL_GetTick(void);
 void HAL_Delay(uint32_t t);
-	
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -346,7 +346,9 @@
  *
  ***************************************************************************
  */
-#define RUN_NUMBER	4000000
+#define RUN_NUMBER	2000000
+
+#include "utils.h"
 
 /* Compiler and system dependent definitions: */
 #ifndef MSC_CLOCK
