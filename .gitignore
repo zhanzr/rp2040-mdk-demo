@@ -1,0 +1,6 @@
+*.uf2
+*.o
+*.d
+Objects/
+Listings/
+*uvguix.*
