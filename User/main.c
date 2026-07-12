@@ -1,6 +1,7 @@
 #define PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK 1
 //#define PICO_STDIO_UART 1
-#define PICO_DEFAULT_UART_BAUD_RATE 460800U
+#define PICO_DEFAULT_UART_BAUD_RATE 115200U
+//#define PICO_DEFAULT_UART_BAUD_RATE 460800U
 //#define PICO_DEFAULT_UART_BAUD_RATE 921600U
 
 #include "pico/stdlib.h"
@@ -18,15 +19,14 @@
 #include "RTE_Components.h"
 #include <assert.h>
 
+#include "utils.h"
+#include "custom_def.h"
+#include "dhry.h"
 
 #if defined(RTE_CMSIS_View_EventRecorder) && defined(RTE_CMSIS_Compiler_STDOUT_Event_Recorder)
 #   include <EventRecorder.h>
 #   include "EventRecorderConf.h"
 #endif
-
-#define	configSYS_CLOCK_K_HZ	125000
-
-#define	configTICK_RATE_HZ	1000
 
 #define UART_ID uart0
 #define UART_TX_PIN 0
@@ -36,35 +36,40 @@ volatile uint32_t g_ticks;
 extern uint32_t __INITIAL_SP;
 extern void _stage2_boot(void);
 
+extern void Proc_5 (void);
+
+void simple_delay(uint32_t t) {
+	uint32_t d = t*100;
+	while(--d) {
+		__NOP();
+	}
+}
+
+void disable_xip_cache(void) {
+    // Write 0 to the XIP control register to disable the cache
+    *(volatile uint32_t *)0x14000000 = 0;
+}
 
 int stdout_putchar (int ch) {
 	if (ch == '\n') {
 		uart_putc_raw(UART_ID, '\r');
+//		simple_delay(1);
 	}
 	uart_putc_raw(UART_ID, (char)ch);
+//	simple_delay(1);
   return (ch);
 }
 
 bool timer_callback(struct repeating_timer *t) {
-    g_ticks++;
-    // You can add other periodic tasks here
-    return true;  // Keep the timer running
+	g_ticks++;
+	
+	// Keep the timer running
+	return true; 
 }
-
-uint32_t HAL_GetTick(void) { return g_ticks; }
-
-void HAL_Delay(uint32_t t) {
-  uint32_t d = t + g_ticks;
-  while (d > g_ticks) {
-    __NOP();
-  }
-}
-
-//void SystemCoreClockUpdate (void) {
-//    SystemCoreClock = clock_get_hz(clk_sys);
-//}
 
 static void system_init(void) {
+//	disable_xip_cache();
+	
 	set_sys_clock_khz(configSYS_CLOCK_K_HZ, true);
 	SystemCoreClockUpdate();
 	
@@ -96,6 +101,7 @@ static void system_init(void) {
 
 	stdio_init_all();
 
+
 	struct repeating_timer timer;
 
 	// Add a repeating timer that fires every 1ms
@@ -103,17 +109,24 @@ static void system_init(void) {
 }
 
 int main(void) {
-    system_init();
+	system_init();
 		
-		printf("RP2040 Pico, @ %u Hz\n", SystemCoreClock);
+	printf("RP2040 Pico, @ %u Hz\n", SystemCoreClock);
+	printf("CC: %s\n", COMPILER_NAME);		
+	printf("vector: %08X %08X %08X %08X %08X\n", __INITIAL_SP, (uint32_t)&__INITIAL_SP, (uint32_t)(&Proc_5), (uint32_t)(main), (uint32_t)(_stage2_boot));		
 
-    while(1) {
+	dhry_main(SystemCoreClock);
+
+	while(1) {
 //			gpio_put(PICO_DEFAULT_LED_PIN, 1);
 //			sleep_ms(configTICK_RATE_HZ);
 //			gpio_put(PICO_DEFAULT_LED_PIN, 0);
 //			sleep_ms(configTICK_RATE_HZ);
-			gpio_xor_mask(1u << PICO_DEFAULT_LED_PIN);
-			printf("@ %u MHz, %08X %08X %08X\n", SystemCoreClock/1000000, (uint32_t)_stage2_boot, __INITIAL_SP, (uint32_t)&__INITIAL_SP);
-			sleep_ms(configTICK_RATE_HZ);
-    }
+		gpio_xor_mask(1u << PICO_DEFAULT_LED_PIN);
+
+		printf("CC: %s\n", COMPILER_NAME);		
+		printf("vector: %08X %08X %08X %08X %08X\n", __INITIAL_SP, (uint32_t)&__INITIAL_SP, (uint32_t)(&Proc_5), (uint32_t)(main), (uint32_t)(_stage2_boot));		
+
+		sleep_ms(10 * configTICK_RATE_HZ);
+	}
 }
