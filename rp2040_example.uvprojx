@@ -330,7 +330,7 @@
             <uC99>1</uC99>
             <uGnu>1</uGnu>
             <useXO>0</useXO>
-            <v6Lang>5</v6Lang>
+            <v6Lang>6</v6Lang>
             <v6LangP>3</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\User</IncludePath>
+              <IncludePath>.\User;.\coremark_1_0_1;.\coremark_1_0_1\rp2040</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -391,16 +391,6 @@
               <FilePath>.\User\main.c</FilePath>
             </File>
             <File>
-              <FileName>dhry_1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\dhry_1.c</FilePath>
-            </File>
-            <File>
-              <FileName>dhry_2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\dhry_2.c</FilePath>
-            </File>
-            <File>
               <FileName>utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\utils.c</FilePath>
@@ -424,6 +414,46 @@
               <FileName>README.md</FileName>
               <FileType>5</FileType>
               <FilePath>.\README.md</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>coremark_1_0_1_core</GroupName>
+          <Files>
+            <File>
+              <FileName>core_list_join.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\coremark_1_0_1\core_list_join.c</FilePath>
+            </File>
+            <File>
+              <FileName>core_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\coremark_1_0_1\core_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>core_matrix.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\coremark_1_0_1\core_matrix.c</FilePath>
+            </File>
+            <File>
+              <FileName>core_state.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\coremark_1_0_1\core_state.c</FilePath>
+            </File>
+            <File>
+              <FileName>core_util.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\coremark_1_0_1\core_util.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>coremark_port</GroupName>
+          <Files>
+            <File>
+              <FileName>core_portme.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\coremark_1_0_1\rp2040\core_portme.c</FilePath>
             </File>
           </Files>
         </Group>

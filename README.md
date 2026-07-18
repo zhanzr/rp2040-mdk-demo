@@ -1,4 +1,4 @@
-# Breath LED Example
+# Example
 
 This example is designed for using RP2040 DFP on the Raspberry Pi Pico. 
 
@@ -25,38 +25,43 @@ Cortex M0+ 125 MHz
 ### Flash cached
 ARMCLANG 6.24
 ```
--Osize
-Execution starts, 2000000 runs through Dhrystone
-MicroSecond for one run through Dhrystone[28-11693]:     5.833
-Dhrystones per Second:  171453.062
-DMIPS/MHz:      0.781
-
 -Omax
-MicroSecond for one run through Dhrystone[28-3324]:      1.648
-Dhrystones per Second:  606796.125
-DMIPS/MHz:      2.763
+2K performance run parameters for coremark.
+CoreMark Size    : 666
+Total ticks      : 13463
+Total time (secs): 13.463000
+Iterations/Sec   : 297.110599
+Iterations       : 4000
+Compiler version : Clang 20.0.0git
+Compiler flags   : -xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c -fno-rtti -funsigned-char -fshort-enums -fshort-wchar
+Memory location  : Static
+seedcrc          : 0xe9f5
+[0]crclist       : 0xe714
+[0]crcmatrix     : 0x1fd7
+[0]crcstate      : 0x8e3a
+[0]crcfinal      : 0x65c5
+Correct operation validated. See readme.txt for run and reporting rules.
+CoreMark 1.0 : 297.110599 / Clang 20.0.0git -xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c -fno-rtti -funsigned-char -fshort-enums -fshort-wchar / Static
 ```
 
 ### Flash uncached
 ARMCLANG 6.24
 ```
--Osize
-Execution starts, 2000000 runs through Dhrystone
-MicroSecond for one run through Dhrystone[15253-242901]:         113.824
-Dhrystones per Second:  8785.493
-DMIPS/MHz:      0.040
-
 -Omax
-MicroSecond for one run through Dhrystone[6884-65796]:   29.456
-Dhrystones per Second:  33948.941
-DMIPS/MHz:      0.155
-```
-
-### SRAM
-ARMCLANG 6.24
-```
--Omax
-MicroSecond for one run through Dhrystone[8677-12165]:   1.744
-Dhrystones per Second:  573394.500
-DMIPS/MHz:      2.611
+2K performance run parameters for coremark.
+CoreMark Size    : 666
+Total ticks      : 282032
+Total time (secs): 282.032000
+Iterations/Sec   : 14.182788
+Iterations       : 4000
+Compiler version : Clang 20.0.0git
+Compiler flags   : -xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c -fno-rtti -funsigned-char -fshort-enums -fshort-wchar
+Memory location  : Static
+seedcrc          : 0xe9f5
+[0]crclist       : 0xe714
+[0]crcmatrix     : 0x1fd7
+[0]crcstate      : 0x8e3a
+[0]crcfinal      : 0x65c5
+Correct operation validated. See readme.txt for run and reporting rules.
+CoreMark 1.0 : 14.182788 / Clang 20.0.0git -xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c -fno-rtti -funsigned-char -fshort-enums -fshort-wchar / Static
 ```

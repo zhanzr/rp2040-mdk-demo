@@ -24,7 +24,7 @@
 
 #include "utils.h"
 #include "custom_def.h"
-#include "dhry.h"
+#include "core_portme.h"
 
 #if defined(RTE_CMSIS_View_EventRecorder) && defined(RTE_CMSIS_Compiler_STDOUT_Event_Recorder)
 #   include <EventRecorder.h>
@@ -39,22 +39,17 @@ volatile uint32_t g_ticks;
 extern uint32_t __INITIAL_SP;
 extern void _stage2_boot(void);
 
-extern void Proc_5 (void);
-
-void simple_delay(uint32_t t) {
-	uint32_t d = t*100;
-	while(--d) {
-		__NOP();
-	}
+// Provides the root anchor symbol that perf_counter needs to attach onto
+void SysTick_Handler(void) {
+    // Keep blank if you are using hardware microsecond timers, 
+    // or handle your standard OS/custom tick increments here.
 }
 
 int stdout_putchar (int ch) {
 	if (ch == '\n') {
 		uart_putc_raw(UART_ID, '\r');
-//		simple_delay(1);
 	}
 	uart_putc_raw(UART_ID, (char)ch);
-//	simple_delay(1);
   return (ch);
 }
 
@@ -107,74 +102,54 @@ static void system_init(void) {
 }
 
 // Define a function pointer prototype matching your dhry_main signature
-typedef void (*dhrystone_func_t)(uint32_t);
+typedef int (*cm_main_func_t)(void);
 
 int main(void) {
 	system_init();
 			
+	printf("RP2040 %u\n", SystemCoreClock);
+	
 	// Flash version
 	
-//	printf("RP2040 XIP Cache Benchmarker\n");
-//	printf("Standard flash function pointer address: 0x%08X\n", (uint32_t)&dhry_main);
+	printf("Standard flash function pointer address: %p\n", coremark_main);
 
-//	// Get the standard address of the benchmark function (typically 0x10xxxxxx)
-//	uint32_t cached_address = (uint32_t)&dhry_main;
+	// Get the standard address of the benchmark function (typically 0x10xxxxxx)
+	uint32_t cached_address = (uint32_t)&coremark_main;
 
-//	// Force the base pointer window from 0x10000000 to 0x13000000
-//	// This retains the original lower offset bits and the essential Thumb bit (bit 0)
-//	uint32_t uncached_address = (cached_address & 0x0FFFFFFF) | 0x13000000;
+	// Force the base pointer window from 0x10000000 to 0x13000000
+	// This retains the original lower offset bits and the essential Thumb bit (bit 0)
+	uint32_t uncached_address = (cached_address & 0x0FFFFFFF) | 0x13000000;
 
-//	// Cast them back to executable function pointers
-//	dhrystone_func_t run_cached_dhry   = (dhrystone_func_t)cached_address;
-//	dhrystone_func_t run_uncached_dhry = (dhrystone_func_t)uncached_address;
+	// Cast them back to executable function pointers
+	cm_main_func_t run_cached_cm_main   = (cm_main_func_t)cached_address;
+	cm_main_func_t run_uncached_cm_main = (cm_main_func_t)uncached_address;
 
-//	while(1) {
-//			// --- TEST 1: CACHED FLASH PERFORMANCE ---
-//			printf("\n[1/2] Starting CACHED flash run (Target: 0x%08X)...\n", cached_address);
-//			
-//			gpio_put(PICO_DEFAULT_LED_PIN, 1); // LED Solid during cached test
-//			run_cached_dhry(SystemCoreClock); 
-//			
-//			printf("CACHED run complete.\n");
-//			sleep_ms(3000);
+	while(1) {
+			// --- TEST 1: CACHED FLASH PERFORMANCE ---
+			printf("\n[1/2] Starting CACHED flash run (Target: %08X)...\n", cached_address);
+			
+			gpio_put(PICO_DEFAULT_LED_PIN, 1); // LED Solid during cached test
+			run_cached_cm_main(); 
+			
+			printf("CACHED run complete. %u\n", SystemCoreClock);
+			sleep_ms(3000);
 
-//			// --- TEST 2: UNCACHED FLASH PERFORMANCE ---
-//			printf("\n[2/2] Starting UNCACHED flash run (Target: 0x%08X)...\n", uncached_address);
-//			printf("Expect this to run significantly slower!\n");
-//			
-//			// Blink fast right before it enters slow mode so you know it's switching
-//			gpio_put(PICO_DEFAULT_LED_PIN, 0); 
-//			sleep_ms(200);
-//			gpio_put(PICO_DEFAULT_LED_PIN, 1);
-//			sleep_ms(200);
-//			gpio_put(PICO_DEFAULT_LED_PIN, 0); 
+			// --- TEST 2: UNCACHED FLASH PERFORMANCE ---
+			printf("\n[2/2] Starting UNCACHED flash run (Target: %08X)...\n", uncached_address);
+			printf("Expect this to run significantly slower!\n");
+			
+			// Blink fast right before it enters slow mode so you know it's switching
+			gpio_put(PICO_DEFAULT_LED_PIN, 0); 
+			sleep_ms(200);
+			gpio_put(PICO_DEFAULT_LED_PIN, 1);
+			sleep_ms(200);
+			gpio_put(PICO_DEFAULT_LED_PIN, 0); 
 
-//			// This executes the exact code out of flash but forces a raw 
-//			// serial QSPI pin lookup for every loop fetch cycle.
-//			run_uncached_dhry(SystemCoreClock); 
-//			
-//			printf("UNCACHED run complete.\n");
-//			sleep_ms(3000);
-//	}
-
-	// RAM version
-	// Should define RAM_FUNC and watch the address of the functions
-		printf("RP2040 SRAM-Resident Benchmarker\n");
-    printf("dhry_main execution address: 0x%08X\n", (uint32_t)&dhry_main);
-    // This should print an address starting with 0x2000xxxx
-
-    while(1) {
-        printf("\nStarting Dhrystone from SRAM...\n");
-				printf("dhry_main execution address: 0x%08X\n", (uint32_t)&dhry_main);
-        
-        gpio_put(PICO_DEFAULT_LED_PIN, 1);
-        
-        // This executes at 1-cycle latency directly out of SRAM
-        dhry_main(SystemCoreClock); 
-        
-        gpio_put(PICO_DEFAULT_LED_PIN, 0);
-        
-        printf("SRAM run complete.\n");
-        sleep_ms(5000);
-    }
+			// This executes the exact code out of flash but forces a raw 
+			// serial QSPI pin lookup for every loop fetch cycle.
+			run_uncached_cm_main(); 
+			
+			printf("UNCACHED run complete. %u\n", SystemCoreClock);
+			sleep_ms(3000);
+	}
 }

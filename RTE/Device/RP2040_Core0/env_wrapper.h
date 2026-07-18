@@ -194,8 +194,11 @@ typedef unsigned int        uint;
 
 #define __dmb(...)  __CONCAT(__dmb, __PLOOC_VA_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
 
-#define __dsb       __DSB
-#define __isb       __ISB
+// Force Arm Compiler 6 (Clang) to use its native built-in barrier intrinsics
+#undef __dsb
+#undef __isb
+#define __dsb(x)      __builtin_arm_dsb(x)
+#define __isb(x)      __builtin_arm_isb(x)
 
 typedef uint16_t __uint16_t;
 
