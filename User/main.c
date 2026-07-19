@@ -1,8 +1,8 @@
 #define PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK 1
 //#define PICO_STDIO_UART 1
-//#define PICO_DEFAULT_UART_BAUD_RATE 115200U
+#define PICO_DEFAULT_UART_BAUD_RATE 115200U
 //#define PICO_DEFAULT_UART_BAUD_RATE 230400U
-#define PICO_DEFAULT_UART_BAUD_RATE 460800U
+//#define PICO_DEFAULT_UART_BAUD_RATE 460800U
 //#define PICO_DEFAULT_UART_BAUD_RATE 921600U
 
 #include "pico/stdlib.h"
@@ -115,27 +115,24 @@ int main(void) {
 // Initialize PIO block 0, state machine 0
 	PIO pio = pio0;
 	uint sm = 0;
-	uint offset = pio_add_program(pio, &ws2812_program);
+//	uint offset = pio_add_program(pio, &ws2812_program);
 
+	// Note: Don't use GPIO13 for the standard Pico board, where the pin is used for board power control
+	//
 	// Run the initialization at the standard 800kHz target speed
-	ws2812_program_init(pio, sm, offset, WS2812_PIN, 800000);
+//	ws2812_program_init(pio, sm, offset, WS2812_PIN, 800000);
 	
 	while(1) {
-			printf("\nT1 %u %u\n", HAL_GetTick(), SystemCoreClock);
+			printf("\n%s T1 %u %u\n", PICO_SDK_VERSION_STRING, HAL_GetTick(), SystemCoreClock);
 
-			// Example 1: Pure Red
-			put_pixel(urgb_u32(255, 0, 0));
-			sleep_ms(1000);
-
-			// Example 2: Pure Green
-			put_pixel(urgb_u32(0, 255, 0));
-			sleep_ms(1000);
-
-			// Example 3: Pure Blue
-			put_pixel(urgb_u32(0, 0, 255));
-			sleep_ms(1000);
+//			put_pixel(urgb_u32(255, 0, 0));
+//			sleep_ms(1000);
+//			put_pixel(urgb_u32(0, 255, 0));
+//			sleep_ms(1000);
+//			put_pixel(urgb_u32(0, 0, 255));
+//			sleep_ms(1000);
 		
-			gpio_put(PICO_DEFAULT_LED_PIN, 1); // LED Solid during cached test
+			gpio_put(PICO_DEFAULT_LED_PIN, 1);
 			
 			printf("T2 %u %u\n", HAL_GetTick(), SystemCoreClock);
 			sleep_ms(3000);
