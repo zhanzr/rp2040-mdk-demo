@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\User</IncludePath>
+              <IncludePath>.\User;.</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -391,16 +391,6 @@
               <FilePath>.\User\main.c</FilePath>
             </File>
             <File>
-              <FileName>dhry_1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\dhry_1.c</FilePath>
-            </File>
-            <File>
-              <FileName>dhry_2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\dhry_2.c</FilePath>
-            </File>
-            <File>
               <FileName>utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\utils.c</FilePath>
@@ -424,6 +414,35 @@
               <FileName>README.md</FileName>
               <FileType>5</FileType>
               <FilePath>.\README.md</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ws2812</GroupName>
+          <Files>
+            <File>
+              <FileName>ws2812.pio</FileName>
+              <FileType>7</FileType>
+              <FilePath>.\ws2812.pio</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>2</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument>$Stools/pioasm #F $P@F.pio.h</CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
           </Files>
         </Group>

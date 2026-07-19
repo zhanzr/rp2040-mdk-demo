@@ -1,7 +1,8 @@
 #define PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK 1
 //#define PICO_STDIO_UART 1
-#define PICO_DEFAULT_UART_BAUD_RATE 115200U
-//#define PICO_DEFAULT_UART_BAUD_RATE 460800U
+//#define PICO_DEFAULT_UART_BAUD_RATE 115200U
+//#define PICO_DEFAULT_UART_BAUD_RATE 230400U
+#define PICO_DEFAULT_UART_BAUD_RATE 460800U
 //#define PICO_DEFAULT_UART_BAUD_RATE 921600U
 
 #include "pico/stdlib.h"
@@ -24,12 +25,27 @@
 
 #include "utils.h"
 #include "custom_def.h"
-#include "dhry.h"
 
 #if defined(RTE_CMSIS_View_EventRecorder) && defined(RTE_CMSIS_Compiler_STDOUT_Event_Recorder)
 #   include <EventRecorder.h>
 #   include "EventRecorderConf.h"
 #endif
+
+#include "hardware/pio.h"
+#include "ws2812.pio.h" // Automatically generated header from ws2812.pio
+
+#define WS2812_PIN 23  // Map to your target pin
+#define IS_RGBW false
+
+// Helper function to send the GRB format package to the PIO FIFO block
+static inline void put_pixel(uint32_t pixel_grb) {
+    pio_sm_put_blocking(pio0, 0, pixel_grb << 8u);
+}
+
+// Convert discrete R, G, B channels into a packed 32-bit integer 
+static inline uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b) {
+    return ((uint32_t)(g) << 16) | ((uint32_t)(r) << 8) | (uint32_t)(b);
+}
 
 #define UART_ID uart0
 #define UART_TX_PIN 0
@@ -39,22 +55,11 @@ volatile uint32_t g_ticks;
 extern uint32_t __INITIAL_SP;
 extern void _stage2_boot(void);
 
-extern void Proc_5 (void);
-
-void simple_delay(uint32_t t) {
-	uint32_t d = t*100;
-	while(--d) {
-		__NOP();
-	}
-}
-
 int stdout_putchar (int ch) {
 	if (ch == '\n') {
 		uart_putc_raw(UART_ID, '\r');
-//		simple_delay(1);
 	}
 	uart_putc_raw(UART_ID, (char)ch);
-//	simple_delay(1);
   return (ch);
 }
 
@@ -65,9 +70,7 @@ int stdout_putchar (int ch) {
 //	return true; 
 //}
 
-static void system_init(void) {
-//	disable_xip_cache();
-	
+static void system_init(void) {	
 	set_sys_clock_khz(configSYS_CLOCK_K_HZ, true);
 	SystemCoreClockUpdate();
 	
@@ -106,75 +109,42 @@ static void system_init(void) {
 //	add_repeating_timer_ms(1000 / configTICK_RATE_HZ, timer_callback, NULL, &timer);
 }
 
-// Define a function pointer prototype matching your dhry_main signature
-typedef void (*dhrystone_func_t)(uint32_t);
-
-int main(void) {
+int main(void) {	
 	system_init();
 			
-	// Flash version
+// Initialize PIO block 0, state machine 0
+	PIO pio = pio0;
+	uint sm = 0;
+	uint offset = pio_add_program(pio, &ws2812_program);
+
+	// Run the initialization at the standard 800kHz target speed
+	ws2812_program_init(pio, sm, offset, WS2812_PIN, 800000);
 	
-//	printf("RP2040 XIP Cache Benchmarker\n");
-//	printf("Standard flash function pointer address: 0x%08X\n", (uint32_t)&dhry_main);
+	while(1) {
+			printf("\nT1 %u %u\n", HAL_GetTick(), SystemCoreClock);
 
-//	// Get the standard address of the benchmark function (typically 0x10xxxxxx)
-//	uint32_t cached_address = (uint32_t)&dhry_main;
+			// Example 1: Pure Red
+			put_pixel(urgb_u32(255, 0, 0));
+			sleep_ms(1000);
 
-//	// Force the base pointer window from 0x10000000 to 0x13000000
-//	// This retains the original lower offset bits and the essential Thumb bit (bit 0)
-//	uint32_t uncached_address = (cached_address & 0x0FFFFFFF) | 0x13000000;
+			// Example 2: Pure Green
+			put_pixel(urgb_u32(0, 255, 0));
+			sleep_ms(1000);
 
-//	// Cast them back to executable function pointers
-//	dhrystone_func_t run_cached_dhry   = (dhrystone_func_t)cached_address;
-//	dhrystone_func_t run_uncached_dhry = (dhrystone_func_t)uncached_address;
+			// Example 3: Pure Blue
+			put_pixel(urgb_u32(0, 0, 255));
+			sleep_ms(1000);
+		
+			gpio_put(PICO_DEFAULT_LED_PIN, 1); // LED Solid during cached test
+			
+			printf("T2 %u %u\n", HAL_GetTick(), SystemCoreClock);
+			sleep_ms(3000);
 
-//	while(1) {
-//			// --- TEST 1: CACHED FLASH PERFORMANCE ---
-//			printf("\n[1/2] Starting CACHED flash run (Target: 0x%08X)...\n", cached_address);
-//			
-//			gpio_put(PICO_DEFAULT_LED_PIN, 1); // LED Solid during cached test
-//			run_cached_dhry(SystemCoreClock); 
-//			
-//			printf("CACHED run complete.\n");
-//			sleep_ms(3000);
-
-//			// --- TEST 2: UNCACHED FLASH PERFORMANCE ---
-//			printf("\n[2/2] Starting UNCACHED flash run (Target: 0x%08X)...\n", uncached_address);
-//			printf("Expect this to run significantly slower!\n");
-//			
-//			// Blink fast right before it enters slow mode so you know it's switching
-//			gpio_put(PICO_DEFAULT_LED_PIN, 0); 
-//			sleep_ms(200);
-//			gpio_put(PICO_DEFAULT_LED_PIN, 1);
-//			sleep_ms(200);
-//			gpio_put(PICO_DEFAULT_LED_PIN, 0); 
-
-//			// This executes the exact code out of flash but forces a raw 
-//			// serial QSPI pin lookup for every loop fetch cycle.
-//			run_uncached_dhry(SystemCoreClock); 
-//			
-//			printf("UNCACHED run complete.\n");
-//			sleep_ms(3000);
-//	}
-
-	// RAM version
-	// Should define RAM_FUNC and watch the address of the functions
-		printf("RP2040 SRAM-Resident Benchmarker\n");
-    printf("dhry_main execution address: 0x%08X\n", (uint32_t)&dhry_main);
-    // This should print an address starting with 0x2000xxxx
-
-    while(1) {
-        printf("\nStarting Dhrystone from SRAM...\n");
-				printf("dhry_main execution address: 0x%08X\n", (uint32_t)&dhry_main);
-        
-        gpio_put(PICO_DEFAULT_LED_PIN, 1);
-        
-        // This executes at 1-cycle latency directly out of SRAM
-        dhry_main(SystemCoreClock); 
-        
-        gpio_put(PICO_DEFAULT_LED_PIN, 0);
-        
-        printf("SRAM run complete.\n");
-        sleep_ms(5000);
-    }
+			// Blink fast right before it enters slow mode so you know it's switching
+			gpio_put(PICO_DEFAULT_LED_PIN, 0); 
+			sleep_ms(200);
+			gpio_put(PICO_DEFAULT_LED_PIN, 1);
+			sleep_ms(200);
+			gpio_put(PICO_DEFAULT_LED_PIN, 0); 
+	}
 }

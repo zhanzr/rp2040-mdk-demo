@@ -4,3 +4,4 @@
 Objects/
 Listings/
 *uvguix.*
+*.pio.h
